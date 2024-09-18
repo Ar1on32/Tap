@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Меняющийся фон с волнами</title>
+<style>
+body {
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  transition: background-color 1s ease;
+  touch-action: none; /* Предотвращение масштабирования на мобильных */
+}
+
+#circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: blue;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  transition: background-color 0.3s ease, transform 0.3s ease, border-radius 0.3s ease;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 768px) {
+  #circle {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  #circle {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+#circle:hover {
+  background-color: red;
+  transform: scale(1.1);
+  border-radius: 0;
+}
+
+#circle-text {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  user-select: none;
+}
+
+/* Медиа-запросы для адаптивности текста */
+@media (max-width: 768px) {
+  #circle-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  #circle-text {
+    font-size: 12px;
+  }
+}
+
+.wave {
+  position: absolute;
+  border-radius: 50%;
+  animation: waveAnimation 1s linear forwards;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Медиа-запросы для адаптивности волн */
+@media (max-width: 768px) {
+  .wave {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wave {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.wave-text {
+  color: white;
+  font-size: 12px;
+  user-select: none;
+}
+
+/* Медиа-запросы для адаптивности текста волн */
+@media (max-width: 768px) {
+  .wave-text {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wave-text {
+    font-size: 8px;
+  }
+}
+
+@keyframes waveAnimation {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes rotateAnimation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
+</head>
+<body>
+  <div id="circle">
+    <span id="circle-text">ТАП</span>
+  </div>
+
+  <script>
+    const circle = document.getElementById('circle');
+    let currentColor = 'white';
+    let waveColor = 'rgba(0, 0, 0, 0.2)';
+
+    circle.addEventListener('click', function() {
+      if (currentColor === 'white') {
+        currentColor = 'black';
+        waveColor = 'rgba(255, 255, 255, 0.2)';
+      } else {
+        currentColor = 'white';
+        waveColor = 'rgba(0, 0, 0, 0.2)';
+      }
+      document.body.style.backgroundColor = currentColor;
+
+      circle.style.animation = 'rotateAnimation 0.3s linear';
+      circle.addEventListener('animationend', function() {
+        circle.style.animation = '';
+      }, {once: true});
+    });
+
+    document.body.addEventListener('click', function(event) {
+      if (event.target !== circle) {
+        createWave(event.clientX, event.clientY, waveColor);
+      }
+    });
+
+    function createWave(x, y, color) {
+      const wave = document.createElement('div');
+      wave.classList.add('wave');
+
+      // Генерируем случайный цвет
+      const randomColor = getRandomColor();
+      wave.style.backgroundColor = randomColor;
+      const waveText = document.createElement('span');
+      waveText.classList.add('wave-text');
+      waveText.textContent = '👋';
+      wave.appendChild(waveText);
+
+      document.body.appendChild(wave);
+
+      const waveWidth = wave.clientWidth;
+      const waveHeight = wave.clientHeight;
+
+      wave.style.left = (x - waveWidth / 2) + 'px';
+      wave.style.top = (y - waveHeight / 2) + 'px';
+
+      wave.addEventListener('animationend', function() {
+        wave.remove();
+      });
+    }
+
+    // Функция для генерации случайного цвета
+    function getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+  </script>
+</body>
+</html>
